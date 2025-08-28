@@ -27,10 +27,23 @@ class AppDatabase {
     //await db.execute("DROP TABLE toilet;");
   }
 
+  Future<void> createCarrotTable(Database db) async {
 
+    await db.execute('''CREATE TABLE IF NOT EXISTS carrots(
+      id TEXT PRIMARY KEY,              -- Local UUID or other unique ID
+      carrotColor TEXT,             
+      contactId TEXT,
+      created_at TEXT,
+      updated_at TEXT,
+      FOREIGN KEY(contactId) REFERENCES appcontacts(id) ON DELETE CASCADE
+    );''');
+
+    //await db.execute("DROP TABLE toilet;");
+  }
 
   Future<void> createTables(Database db) async {
     await createContactTable(db);
+    await createCarrotTable(db);
   }
 
   Future<Database> database() async {  
@@ -101,13 +114,13 @@ class AppDatabase {
 
     await createTables(db);
 
-    String localId = const Uuid().v4();
+    //String localId = const Uuid().v4();
     DateTime dt = DateTime.now();
 
     await db.insert(
-      'toilet',
+      'appcontacts',
       {
-        'id': localId,
+        'id': contact.id,
         'name' : contact.name,
         'email' : contact.email,
         'phone' : contact.phone,
@@ -126,11 +139,41 @@ class AppDatabase {
     await createTables(db);
 
     await db.delete(
-      'toilet',
-      where: "toiletId = ?",
+      'appcontacts',
+      where: "id = ?",
       whereArgs: [appContact.id]
     );
 
+
+
+  }
+
+
+  Future<Carrot> insertCarrot(AppContact contact, String carrotColor) async {
+    final db = await database();
+
+    await createTables(db);
+
+    String localId = const Uuid().v4();
+    DateTime dt = DateTime.now();
+
+    await db.insert(
+      'carrots',
+      {
+        'id' : localId,
+        'contactId': contact.id,
+        'carrotColor' : carrotColor,
+        'created_at' : dt.toIso8601String(),
+        'updated_at' : dt.toIso8601String(), 
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace, // Replace if toiletId already exists
+    );
+
+    return Carrot(
+      contact: contact, 
+      carrotColor: carrotColor, 
+      dateCreated: dt
+    );
   }
 
 
@@ -142,9 +185,9 @@ class AppDatabase {
       try {
         appContacts.add(
           AppContact(
-            id : item[''],
+            id : item['id'],
             name: item['name'],
-            email : item[''],
+            email : item['email'],
             phone : item['phone'],
           )
         );
@@ -172,11 +215,53 @@ class AppDatabase {
       """
     );
 
-    contacts = _processContactData(contactData);
+    
 
+    contacts = _processContactData(contactData);
+    logInfo("CONTACT DATA $contacts");
 
     return contacts;
   }
+
+  _processCarrotData(List<AppContact> contacts, List<Map<String,dynamic>> carrotData) {
+    //Map the contact data so it can be retrieved while iterating through the carrotdata
+    final Map<String, AppContact> contactsMap = { for (var contact in contacts) (contact).id : contact };
+
+    List<Carrot> carrots = [];
+
+    for (var carrotItem in carrotData) {
+      AppContact assocaitedContact = contactsMap[carrotItem['contactId']]!;
+
+      carrots.add(
+        Carrot(
+          contact: assocaitedContact, 
+          carrotColor: carrotItem['carrotColor'], 
+          dateCreated: DateTime.parse(carrotItem['created_at']),
+        )
+      );
+    }
+
+    return carrots;
+  }
+
+   Future<List<Carrot>> getAllCarrots(List<AppContact> contactMatchingList ) async {
+    List<Carrot> carrots = [];
+
+    final db = await database();
+    await createTables(db);
+
+    List<Map<String, dynamic>> carrotData = await db.rawQuery(
+      """
+        SELECT * FROM carrots; 
+      """);
+    logInfo("CARROT DATA $carrotData");
+
+    carrots = _processCarrotData(contactMatchingList,carrotData);
+    //logInfo("DATA CARROT LIST $carrotList");
+
+    return carrots;
+
+   }
 
 
 }
@@ -195,4 +280,16 @@ class AppContact {
     required this.phone
   });
 
+}
+
+class Carrot{
+  final AppContact contact;
+  final String carrotColor;
+  final DateTime dateCreated;
+
+  Carrot({
+    required this.contact,
+    required this.carrotColor,
+    required this.dateCreated,
+  });
 }

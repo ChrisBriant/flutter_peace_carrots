@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:loggy/loggy.dart';
+import 'package:peacecarrots/data/database.dart';
 import 'package:provider/provider.dart';
 import '../providers/dataprovider.dart';
+import 'package:uuid/uuid.dart';
 
 class AddContactForm extends StatefulWidget {
   const AddContactForm({super.key});
@@ -15,6 +17,41 @@ class _AddContactFormState extends State<AddContactForm> {
   TextEditingController emailAddressController = TextEditingController();
   TextEditingController numberContoller = TextEditingController();
 
+
+  _handleAddContact(BuildContext context) async {
+    bool formHasEmpty  = nameController.text.isEmpty || emailAddressController.text.isEmpty || numberContoller.text.isEmpty;
+    if(formHasEmpty) {
+      if(context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please complete the contact details to proceed.')));
+      }
+      return;
+    }
+
+    String localId = const Uuid().v4();
+
+    AppContact newContact = AppContact(
+      id: localId, 
+      name: nameController.text, 
+      email: emailAddressController.text, 
+      phone: numberContoller.text
+    );
+
+    try {
+      AppDatabase db = AppDatabase();
+      await db.insertContactFromObject(newContact);
+      //Set selected contact in the provider
+      if(context.mounted) {
+        DataProvider dataProvider = Provider.of(context,listen: false);
+        dataProvider.setSelectedAppContact(newContact);
+        Navigator.of(context).popAndPushNamed('/surveyscreen');
+      }
+    } catch(err) {
+      logInfo('ERROR INSERTING CONTACT $err');
+      if(context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Unable to add the contact.')));
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -66,7 +103,7 @@ class _AddContactFormState extends State<AddContactForm> {
             ),
             const SizedBox(height: 10,),
             ElevatedButton(
-              onPressed: () {}, 
+              onPressed: () => _handleAddContact(context), 
               style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black87, // Transparent button background
                     foregroundColor: Colors.white, // White text color

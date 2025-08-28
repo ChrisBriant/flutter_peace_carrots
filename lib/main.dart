@@ -27,17 +27,19 @@ class PeaceCarrots extends StatelessWidget {
   Widget build(BuildContext context) {
 
     Future<List<AppContact>> getContacts() async {
-      
-      List<AppContact> contacts = [];
       AppDatabase db = AppDatabase();
 
       try {
-        contacts = await db.getAppContacts();
-      } catch(err) {
-        logError("Datbase error $err");
+        List<AppContact> contacts = await db.getAppContacts();
+        //Needs to also get the carrots
+        List<Carrot> carrots = await db.getAllCarrots(contacts);
+        logInfo('DATA CARROTS FOUND $carrots');
+        return contacts;
+      } catch (err) {
+        logError("Database error: $err");
+        // It's often better to re-throw the error so the caller knows something went wrong.
+        rethrow;
       }
-
-      return contacts;
     }
 
     return MultiProvider(
@@ -61,6 +63,9 @@ class PeaceCarrots extends StatelessWidget {
 
             if(sn.hasData) {
               logInfo("HAS DATA ${sn.data}");
+              //Update the provider
+              DataProvider dataProvider = Provider.of(ctx,listen:false);
+              dataProvider.setAppContacts(sn.data!);
             }
 
             //return const HomeScreen();

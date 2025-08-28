@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:loggy/loggy.dart';
+import 'package:peacecarrots/widgets/custombutton1.dart';
+import 'package:provider/provider.dart';
+import '../data/database.dart';
+import '../providers/dataprovider.dart';
 
 class AngerQuestionSelect extends StatefulWidget {
   const AngerQuestionSelect({super.key});
@@ -24,6 +28,7 @@ class _AngerQuestionSelectState extends State<AngerQuestionSelect> {
           'F': 'I feel a deep sense of indignation, believing the person is in the wrong.',
           'G': 'I feel a sense of superiority, as if their actions are beneath me.',
         },
+        'answer' : null,
         'scores': {
           'A': 0,
           'B': 0,
@@ -45,6 +50,7 @@ class _AngerQuestionSelectState extends State<AngerQuestionSelect> {
           'F': 'A profound disappointment and a feeling of righteous anger.',
           'G': 'A cold contempt for the person\'s character and lack of morals.',
         },
+        'answer' : null,
         'scores': {
           'A': 0,
           'B': 0,
@@ -66,6 +72,7 @@ class _AngerQuestionSelectState extends State<AngerQuestionSelect> {
           'F': 'I feel a deep sense of injustice, believing the system is rigged against me.',
           'G': 'I feel a sense of condescension towards those around me for their lack of foresight.',
         },
+        'answer' : null,
         'scores': {
           'A': 0,
           'B': 0,
@@ -87,6 +94,7 @@ class _AngerQuestionSelectState extends State<AngerQuestionSelect> {
           'F': 'That I\'m deeply hurt and feel wronged.',
           'G': 'That I\'m acting aloof or superior.',
         },
+        'answer' : null,
         'scores': {
           'A': 0,
           'B': 0,
@@ -108,6 +116,7 @@ class _AngerQuestionSelectState extends State<AngerQuestionSelect> {
           'F': 'My anger is like a heavy stone in my heart, a profound and serious weight.',
           'G': 'My anger is a shield that I use to show my disapproval and power.',
         },
+        'answer' : null,
         'scores': {
           'A': 0,
           'B': 0,
@@ -129,6 +138,7 @@ class _AngerQuestionSelectState extends State<AngerQuestionSelect> {
           'F': '"This is fundamentally wrong. I have been truly wronged."',
           'G': '"How could they be so stupid/incompetent? They are beneath me."',
         },
+        'answer' : null,
         'scores': {
           'A': 0,
           'B': 0,
@@ -150,6 +160,7 @@ class _AngerQuestionSelectState extends State<AngerQuestionSelect> {
           'F': 'It is a fundamental part of a serious issue and can last indefinitely.',
           'G': 'It fades once I feel I have successfully asserted my dominance.',
         },
+        'answer' : null,
         'scores': {
           'A': 0,
           'B': 0,
@@ -163,6 +174,111 @@ class _AngerQuestionSelectState extends State<AngerQuestionSelect> {
     ],
   };
 
+  _handleSubmitSurvey(BuildContext context) async {
+    //Check all questions have been answered
+    bool hasNullAnswer = angerSpectrumQuiz['questions'].any((question) => question['answer'] == null);
+    if(hasNullAnswer) {
+      if(context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please complete all questions to proceed.')));
+      }
+      return;
+    }
+    //Calculate the score and the carrot
+    Map<String,int> scores = {
+      'red' : 0,
+      'orange' : 0,
+      'yellow' : 0,
+      'green' : 0,
+      'blue' : 0,
+      'indigo' : 0,
+      'violet' : 0,
+    };
+    // int redScore = 0;
+    // int orangeScore = 0;
+    // int yellowScore = 0;
+    // int greenScore = 0;
+    // int blueScore = 0;
+    // int indigoScore = 0;
+    // int violetScore = 0;
+
+    for (var question in angerSpectrumQuiz['questions']) {
+      switch (question['answer']) {
+        case 'A':
+          if (scores['red'] != null) {
+            scores['red'] = scores['red']! + 1;
+          }
+          break;
+        case 'B':
+          scores['orange'] = (scores['orange'] ?? 0) + 1;
+          break;
+        case 'C':
+          scores['yellow'] = (scores['yellow'] ?? 0) + 1;
+          break;
+        case 'D':
+          scores['green'] = (scores['green'] ?? 0) + 1;
+          break;
+        case 'E':
+          scores['blue'] = (scores['blue'] ?? 0) + 1;
+          break;
+        case 'F':
+          scores['indigo'] = (scores['indigo'] ?? 0) + 1;
+          break;
+        case 'G':
+          scores['violet'] = (scores['violet'] ?? 0) + 1;
+          break;
+        default:
+          logInfo("ANSWER NOT FOUND");
+          return;
+      }
+      
+      
+    }
+
+
+    logInfo("SCORES ${scores}");
+
+    String carrotAwarded = "white";
+
+    final bool allValuesEqual = scores.entries.every((entry) => entry.value == scores.entries.first.value);
+
+    if(allValuesEqual) {
+      logInfo("ALL VALUES ARE EQUAL");
+    } else {
+      // Find the entry with the highest score
+      var highestEntry = scores.entries.reduce((a, b) => a.value > b.value ? a : b);
+      logInfo("Highest Entry ${highestEntry}");
+
+      String highestScoringColor = highestEntry.key;
+      int maxScore = highestEntry.value;
+
+      logInfo('The highest scoring color is: $highestScoringColor with a score of: $maxScore');
+
+      carrotAwarded = highestScoringColor;
+
+    }
+
+    print('CARROT AWARDED = $carrotAwarded');
+    //Write to database
+    if(context.mounted) {
+      AppDatabase db = AppDatabase();
+      DataProvider dataProvider = Provider.of(context,listen: false);
+
+      //Fix selected contact for testing
+      dataProvider.setSelectedAppContact(dataProvider.appContacts[0]);
+      try {
+        Carrot insertedCarrot = await db.insertCarrot(dataProvider.selectedAppContact!, carrotAwarded);
+      } catch (err) {
+        logError("UNABLE TO INSERT CARROT $err");
+
+      }
+      
+
+    }
+
+
+
+  }
+
   List<QuestionWidget> getQuestionWidgets() {
     List<QuestionWidget> questionWidgets = [];
 
@@ -171,9 +287,20 @@ class _AngerQuestionSelectState extends State<AngerQuestionSelect> {
         QuestionWidget(
           question: Question(
             text: questionItem['questionText'], 
-            options: questionItem['options']
+            options: questionItem['options'],
           ), 
-          onAnswerSelected: (str) {}
+          onAnswerSelected: (ans) {
+            logInfo("QUESTION ANSWERED");
+            logInfo("QUESTION ${questionItem['questionText']} ANSWER: ${ans}");
+            logInfo("QUESTION ${questionItem['options'][ans]}");
+
+            //Set the selected answer
+            setState(() {
+              questionItem['answer'] = ans;
+            });
+            
+          },
+          selectedAnswer : questionItem['answer']
         )
       );
     }
@@ -188,7 +315,12 @@ class _AngerQuestionSelectState extends State<AngerQuestionSelect> {
     logInfo(questionWidgets);
 
     return Column(
-      children: questionWidgets,
+      children: [
+        ...questionWidgets,
+        const SizedBox(height: 10,),
+        CustomButton1(onPressed: () => _handleSubmitSurvey(context), label: "Finish",),
+        const SizedBox(height: 10,)
+      ]
     );
   }
 }
@@ -245,7 +377,7 @@ class QuestionWidget extends StatelessWidget {
                   child: Center(child: Text(question.options[option])),
                 ),
               );
-            }).toList(),
+            }),
           ],
         ),
       ),
