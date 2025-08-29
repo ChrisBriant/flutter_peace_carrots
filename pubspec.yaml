@@ -68,7 +68,15 @@ flutter:
     - assets/carrots_bg.jpg
     - assets/rabbit_mascot.png
     - assets/peace_carrots_text_white.png
-
+    - assets/red_carrot.png
+    - assets/orange_carrot.png
+    - assets/yellow_carrot.png
+    - assets/green_carrot.png
+    - assets/blue_carrot.png
+    - assets/indigo_carrot.png
+    - assets/violet_carrot.png
+    - assets/white_carrot.png
+    
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 
