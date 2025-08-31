@@ -7,7 +7,8 @@ class DataProvider extends ChangeNotifier {
   Contact? _selectedContact;
   AppContact? _selectedAppContact;
   List<AppContact> _appContacts = [];
-
+  List<Carrot> _carrots = [];
+ 
   setSelectedContact(Contact c) {
     _selectedContact = c;
     notifyListeners();
@@ -21,7 +22,12 @@ class DataProvider extends ChangeNotifier {
     _appContacts = appContacts;
   }
 
+  setCarrots(List<Carrot> carrots) {
+    _carrots = carrots;
+  }  
+
   Contact? get selectedContact => _selectedContact;
   AppContact? get selectedAppContact => _selectedAppContact;
   List<AppContact> get appContacts => _appContacts;
+  List<Carrot> get carrots => _carrots;
 }

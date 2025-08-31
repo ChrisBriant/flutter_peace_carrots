@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:peacecarrots/screens/homescreen.dart';
 import 'package:peacecarrots/screens/loadingscreen.dart';
 import 'package:peacecarrots/screens/surveyscreen.dart';
+import './screens/carrotdisplayscreen.dart';
 import './screens/addpersonscreen.dart';
 import 'package:loggy/loggy.dart';
 import 'package:provider/provider.dart';
@@ -26,7 +27,7 @@ class PeaceCarrots extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    Future<List<AppContact>> getContacts() async {
+    Future<(List<AppContact>, List<Carrot>)> getContacts() async {
       AppDatabase db = AppDatabase();
 
       try {
@@ -34,7 +35,7 @@ class PeaceCarrots extends StatelessWidget {
         //Needs to also get the carrots
         List<Carrot> carrots = await db.getAllCarrots(contacts);
         logInfo('DATA CARROTS FOUND $carrots');
-        return contacts;
+        return (contacts, carrots);
       } catch (err) {
         logError("Database error: $err");
         // It's often better to re-throw the error so the caller knows something went wrong.
@@ -54,7 +55,7 @@ class PeaceCarrots extends StatelessWidget {
       
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         ),
-        home: FutureBuilder<List<AppContact>>(
+        home: FutureBuilder<(List<AppContact>, List<Carrot>)>(
           future: getContacts(), 
           builder: (ctx,sn) {
             if(sn.connectionState == ConnectionState.waiting) {
@@ -65,17 +66,19 @@ class PeaceCarrots extends StatelessWidget {
               logInfo("HAS DATA ${sn.data}");
               //Update the provider
               DataProvider dataProvider = Provider.of(ctx,listen:false);
-              dataProvider.setAppContacts(sn.data!);
+              dataProvider.setAppContacts(sn.data!.$1);
+              dataProvider.setCarrots(sn.data!.$2);
             }
 
-            //return const HomeScreen();
-            return const SurveyScreen();
+            return const HomeScreen();
+            //return const SurveyScreen();
           }
         ),
         routes: {
           HomeScreen.routeName : (context) => const HomeScreen(),
           AddPersonScreen.routeName : (context) => const AddPersonScreen(),
           SurveyScreen.routeName : (context) => const SurveyScreen(),
+          CarrotDisplayScreen.routeName : (context) => const CarrotDisplayScreen(),
         },
       ),
     );

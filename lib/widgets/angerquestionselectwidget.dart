@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:loggy/loggy.dart';
+import 'package:peacecarrots/widgets/carrotdisplaywidget.dart';
 import 'package:peacecarrots/widgets/custombutton1.dart';
 import 'package:provider/provider.dart';
 import '../data/database.dart';
 import '../providers/dataprovider.dart';
+import '../utils/utils.dart';
 
 class AngerQuestionSelect extends StatefulWidget {
   const AngerQuestionSelect({super.key});
@@ -13,6 +15,9 @@ class AngerQuestionSelect extends StatefulWidget {
 }
 
 class _AngerQuestionSelectState extends State<AngerQuestionSelect> {
+  bool _surveyComplete = false;
+  Carrot? _newCarrot = null;
+
   Map<String, dynamic> angerSpectrumQuiz = {
     'title': 'The Anger Spectrum Quiz',
     'description': 'Find out what type of anger you most commonly feel.',
@@ -264,17 +269,43 @@ class _AngerQuestionSelectState extends State<AngerQuestionSelect> {
       DataProvider dataProvider = Provider.of(context,listen: false);
 
       //Fix selected contact for testing
-      dataProvider.setSelectedAppContact(dataProvider.appContacts[0]);
+      //dataProvider.setSelectedAppContact(dataProvider.appContacts[0]);
       try {
         Carrot insertedCarrot = await db.insertCarrot(dataProvider.selectedAppContact!, carrotAwarded);
+        dataProvider.carrots.add(insertedCarrot);
+        setState(() {
+          _newCarrot = insertedCarrot;
+        });
       } catch (err) {
         logError("UNABLE TO INSERT CARROT $err");
 
       }
-      
-
     }
 
+    showDialog(
+      context: context, 
+      builder: (context) {
+        String colorCapitalized = AppUtils.capitalize(carrotAwarded);
+
+        return AlertDialog(
+          title: Text("$colorCapitalized Carrot", textAlign: TextAlign.center,),
+          content: CarrotDisplayWidget(carrotColor: carrotAwarded),
+          actionsAlignment: MainAxisAlignment.center,
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _surveyComplete = true;
+                });
+                Navigator.of(context).pop();
+              },
+              child: const Text('Ok')
+            )
+          ],
+        );
+
+      }
+    );
 
 
   }
@@ -313,6 +344,38 @@ class _AngerQuestionSelectState extends State<AngerQuestionSelect> {
   Widget build(BuildContext context) {
     List<Widget> questionWidgets = getQuestionWidgets();
     logInfo(questionWidgets);
+
+    if(_surveyComplete) {
+      return Column(
+        children: [
+          const Text(
+            'Congratulations!',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold
+            ),
+          ),
+          const SizedBox(height: 10,),
+          Image.asset('assets/rabbit_mascot_celebrate.png', height: 200,),
+          const SizedBox(height: 10,),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              CustomButton1(
+                onPressed: () => AppUtils.onShareImage(context, _newCarrot!), 
+                label: 'Send'
+              ),
+              CustomButton1(
+                onPressed: () => Navigator.of(context).popAndPushNamed("/carrotdisplayscreen"), 
+                label: 'My Carrots'
+              ),
+            ],
+          )
+        ]
+
+      );
+    }
 
     return Column(
       children: [

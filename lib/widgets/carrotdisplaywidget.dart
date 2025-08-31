@@ -11,34 +11,38 @@ class CarrotDisplayWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String colorCapitalized = AppUtils.capitalize(carrotColor);
     String angerText = AppUtils.angerCarrots[carrotColor]['text'];
     String peaceText = AppUtils.peaceCarrots[carrotColor]['text'];
 
-    return Column(
-      children: [
-        Text("$colorCapitalized Carrot",
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold
-          ),
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * .4,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Text("$colorCapitalized Carrot",
+            //   style: TextStyle(
+            //     fontSize: 20,
+            //     fontWeight: FontWeight.bold
+            //   ),
+            // ),
+            const SizedBox(height: 10,),
+            Text(angerText,
+              style: TextStyle(
+                fontSize: 14
+              ),
+            ),
+            const SizedBox(height: 10,),
+            Image.asset('assets/${carrotColor}_carrot.png', height: 200,),
+            const SizedBox(height: 10,),
+            Text(peaceText,
+              style: TextStyle(
+                fontSize: 14
+              ),
+            ),
+            const SizedBox(height: 10,),
+          ],
         ),
-        const SizedBox(height: 10,),
-        Text(angerText,
-          style: TextStyle(
-            fontSize: 14
-          ),
-        ),
-        const SizedBox(height: 10,),
-        Image.asset('assets/${carrotColor}_carrot.png'),
-        const SizedBox(height: 10,),
-        Text(peaceText,
-          style: TextStyle(
-            fontSize: 14
-          ),
-        ),
-        const SizedBox(height: 10,),
-      ],
+      ),
     );
   }
 }

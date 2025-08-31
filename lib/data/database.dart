@@ -170,6 +170,7 @@ class AppDatabase {
     );
 
     return Carrot(
+      id: localId,
       contact: contact, 
       carrotColor: carrotColor, 
       dateCreated: dt
@@ -234,6 +235,7 @@ class AppDatabase {
 
       carrots.add(
         Carrot(
+          id: carrotItem['id'],
           contact: assocaitedContact, 
           carrotColor: carrotItem['carrotColor'], 
           dateCreated: DateTime.parse(carrotItem['created_at']),
@@ -283,11 +285,13 @@ class AppContact {
 }
 
 class Carrot{
+  final String id;
   final AppContact contact;
   final String carrotColor;
   final DateTime dateCreated;
 
   Carrot({
+    required this.id,
     required this.contact,
     required this.carrotColor,
     required this.dateCreated,

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/dataprovider.dart';
 
 class HomePageLayout extends StatelessWidget {
   const HomePageLayout({super.key});
@@ -35,24 +37,26 @@ class HomePageLayout extends StatelessWidget {
           ),
           Positioned(
             bottom: 10,
-            child: ElevatedButton(
-              onPressed: () => Navigator.of(context).popAndPushNamed('/addpersonscreen'), 
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black87, // Transparent button background
-                  foregroundColor: Colors.white, // White text color
-                  side: const BorderSide(color: Colors.white, width: 4), // White border
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30), // Rounded corners
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15), // Spacious padding
-                  elevation: 0, // No shadow for a flat, modern look
-              ),
-              child: const Text(
-                'Spread Peace!',
-                style: TextStyle(
-                  fontSize: 20
+            child: Consumer<DataProvider>(
+              builder: (ctx,dataProvider,_) => ElevatedButton(
+                onPressed: dataProvider.carrots.isEmpty ?  () => Navigator.of(context).popAndPushNamed('/addpersonscreen') : () => Navigator.of(context).popAndPushNamed('/carrotdisplayscreen'), 
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black87, // Transparent button background
+                    foregroundColor: Colors.white, // White text color
+                    side: const BorderSide(color: Colors.white, width: 4), // White border
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30), // Rounded corners
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15), // Spacious padding
+                    elevation: 0, // No shadow for a flat, modern look
                 ),
-              )
+                child: const Text(
+                  'Spread Peace!',
+                  style: TextStyle(
+                    fontSize: 20
+                  ),
+                )
+              ),
             ),
           )
         ],
