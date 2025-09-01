@@ -20,23 +20,33 @@ class SurveyScreen extends StatelessWidget {
         ),
         backgroundColor: Colors.black,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            TextBoxWidget(
-              backgroundColor: Colors.red.shade400,
-              textColor: Colors.white,
-              borderColor: Colors.green,
-              size: 16,
-              text: "Take the survey below to make a peace carrot.",
-            ),
-            const SizedBox(height: 10,),
-            BoxContent(
-              backgroundColor: Colors.red.shade400,
-              borderColor: Colors.green,
-              child: AngerQuestionSelect(),
-            ),
-          ],
+      body: Container(
+        height: double.infinity,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/clouds_thunder_bg.jpg'),
+            repeat: ImageRepeat.repeat,
+          ),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 10,),
+              TextBoxWidget(
+                backgroundColor: Colors.red.shade400,
+                textColor: Colors.white,
+                borderColor: Colors.green,
+                size: 16,
+                text: "Take the survey below to make a peace carrot.",
+              ),
+              const SizedBox(height: 10,),
+              BoxContent(
+                backgroundColor: Colors.red.shade400,
+                borderColor: Colors.green,
+                child: AngerQuestionSelect(),
+              ),
+            ],
+          ),
         ),
       ),
     );

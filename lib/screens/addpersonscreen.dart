@@ -46,70 +46,81 @@ class _AddPersonScreenState extends State<AddPersonScreen> {
         title: const Text("Add Person", style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.black,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            TextBoxWidget(
-              backgroundColor: Colors.red.shade400,
-              textColor: Colors.white,
-              borderColor: Colors.green,
-              size: 16,
-              text: "Enter the details of someone you are feel anger towards or select from your contacts.",
-            ),
-            const SizedBox(height: 10),
-            BoxContent(
-              backgroundColor: Colors.red.shade400,
-              borderColor: Colors.green,
-              child: const AddContactForm(),
-            ),
-            const SizedBox(height: 10),
-            FutureBuilder<List<Contact>>(
-              // Pass the single, pre-initialized Future instance.
-              future: _contactsFuture,
-              builder: (ctx, sn) {
-                if (sn.connectionState == ConnectionState.done) {
-                  if (sn.hasError) {
-                    return Text('Error: ${sn.error}');
-                  } else if (sn.hasData && sn.data!.isNotEmpty) {
-                    return ButtonWithIcon(
-                      onTap: () => showDialog(
-                        context: ctx,
-                        builder: (ctx) => AlertDialog(
-                          title: const Text("My Contacts", textAlign: TextAlign.center),
-                          content: MyPhoneContactsDisplay(
-                            myContacts: sn.data!,
-                            onTap: () {},
-                            
+      body: Container(
+        height: double.infinity,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/clouds_thunder_bg.jpg'),
+            repeat: ImageRepeat.repeat,
+          ),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 10,),
+              Image.asset('assets/rabbit_mascot_head_and_torso.png', height: 200,),
+              TextBoxWidget(
+                backgroundColor: Colors.red.shade400,
+                textColor: Colors.white,
+                borderColor: Colors.green,
+                size: 16,
+                text: "Enter the details of someone you are feel anger towards or select from your contacts.",
+              ),
+              const SizedBox(height: 10),
+              BoxContent(
+                backgroundColor: Colors.red.shade400,
+                borderColor: Colors.green,
+                child: const AddContactForm(),
+              ),
+              const SizedBox(height: 10),
+              FutureBuilder<List<Contact>>(
+                // Pass the single, pre-initialized Future instance.
+                future: _contactsFuture,
+                builder: (ctx, sn) {
+                  if (sn.connectionState == ConnectionState.done) {
+                    if (sn.hasError) {
+                      return Text('Error: ${sn.error}');
+                    } else if (sn.hasData && sn.data!.isNotEmpty) {
+                      return ButtonWithIcon(
+                        onTap: () => showDialog(
+                          context: ctx,
+                          builder: (ctx) => AlertDialog(
+                            title: const Text("My Contacts", textAlign: TextAlign.center),
+                            content: MyPhoneContactsDisplay(
+                              myContacts: sn.data!,
+                              onTap: () {},
+                              
+                            ),
+                            actionsAlignment: MainAxisAlignment.center,
+                            actions: [
+                              ElevatedButton(
+                                onPressed: () => {},
+                                child: const Text('Add'),
+                              ),
+                              ElevatedButton(
+                                onPressed: () => Navigator.of(ctx).pop(),
+                                child: const Text('Cancel'),
+                              ),
+                            ],
                           ),
-                          actionsAlignment: MainAxisAlignment.center,
-                          actions: [
-                            ElevatedButton(
-                              onPressed: () => {},
-                              child: const Text('Add'),
-                            ),
-                            ElevatedButton(
-                              onPressed: () => Navigator.of(ctx).pop(),
-                              child: const Text('Cancel'),
-                            ),
-                          ],
                         ),
-                      ),
-                      waiting: false,
-                      backgroundColor: Colors.white54,
-                      borderColor: Colors.white,
-                      textColor: Colors.white,
-                      label: "Add From Contacts",
-                      icon: Icon(Icons.person, color: Colors.white),
-                    );
+                        waiting: false,
+                        backgroundColor: Colors.black87,
+                        borderColor: Colors.white,
+                        textColor: Colors.white,
+                        label: "Add From Contacts",
+                        icon: Icon(Icons.person, color: Colors.white),
+                      );
+                    } else {
+                      return const Text('No contacts found on device.');
+                    }
                   } else {
-                    return const Text('No contacts found on device.');
+                    return const CircularProgressIndicator();
                   }
-                } else {
-                  return const CircularProgressIndicator();
-                }
-              },
-            ),
-          ],
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

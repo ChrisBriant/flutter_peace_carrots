@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:peacecarrots/screens/glossaryscreen.dart';
 import 'package:peacecarrots/screens/homescreen.dart';
 import 'package:peacecarrots/screens/loadingscreen.dart';
 import 'package:peacecarrots/screens/surveyscreen.dart';
@@ -79,6 +80,7 @@ class PeaceCarrots extends StatelessWidget {
           AddPersonScreen.routeName : (context) => const AddPersonScreen(),
           SurveyScreen.routeName : (context) => const SurveyScreen(),
           CarrotDisplayScreen.routeName : (context) => const CarrotDisplayScreen(),
+          GlossaryScreen.routeName : (context) => const GlossaryScreen(),
         },
       ),
     );

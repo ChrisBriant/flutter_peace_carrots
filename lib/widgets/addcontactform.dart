@@ -19,7 +19,7 @@ class _AddContactFormState extends State<AddContactForm> {
 
 
   _handleAddContact(BuildContext context) async {
-    bool formHasEmpty  = nameController.text.isEmpty || emailAddressController.text.isEmpty || numberContoller.text.isEmpty;
+    bool formHasEmpty  = nameController.text.isEmpty; // || emailAddressController.text.isEmpty || numberContoller.text.isEmpty;
     if(formHasEmpty) {
       if(context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please complete the contact details to proceed.')));
@@ -90,18 +90,18 @@ class _AddContactFormState extends State<AddContactForm> {
               decoration: customFormDecoration(labelText: "Name")
             ),
             const SizedBox(height: 10,),
-            TextField(
-              controller: emailAddressController,
-              keyboardType: TextInputType.emailAddress,
-              decoration: customFormDecoration(labelText: "Email Address"),
-            ),
-            const SizedBox(height: 10,),
-            TextField(
-              controller: numberContoller,
-              keyboardType: TextInputType.numberWithOptions(),
-              decoration: customFormDecoration(labelText: "Phone Number"),
-            ),
-            const SizedBox(height: 10,),
+            // TextField(
+            //   controller: emailAddressController,
+            //   keyboardType: TextInputType.emailAddress,
+            //   decoration: customFormDecoration(labelText: "Email Address"),
+            // ),
+            // const SizedBox(height: 10,),
+            // TextField(
+            //   controller: numberContoller,
+            //   keyboardType: TextInputType.numberWithOptions(),
+            //   decoration: customFormDecoration(labelText: "Phone Number"),
+            // ),
+            // const SizedBox(height: 10,),
             ElevatedButton(
               onPressed: () => _handleAddContact(context), 
               style: ElevatedButton.styleFrom(

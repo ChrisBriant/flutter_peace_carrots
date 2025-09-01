@@ -80,6 +80,10 @@ flutter:
     - assets/indigo_carrot.png
     - assets/violet_carrot.png
     - assets/white_carrot.png
+    - assets/rabbit_mascot_holding_carrot_torso.png
+    - assets/clouds_bg.jpg
+    - assets/clouds_thunder_bg.jpg
+    - assets/rabbit_mascot_head_and_torso.png
     
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
